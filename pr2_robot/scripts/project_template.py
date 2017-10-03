@@ -46,6 +46,90 @@ def send_to_yaml(yaml_filename, dict_list):
     with open(yaml_filename, 'w') as outfile:
         yaml.dump(data_dict, outfile, default_flow_style=False)
 
+def voxel_downsample(pcl_cloud, leaf_scale, coeffs=(1.0, 1.0, 1.0)):
+    # leaf_scale: sets default scale for voxel edge, units of meters
+    # coeffs: linear scaling factors for edges x, y, z respectively
+    vox = pcl_cloud.make_voxel_grid_filter()
+    x_leaf, y_leaf, z_leaf = (leaf_scale * coeff for coeff in coeffs)
+    vox.set_leaf_size(x_leaf, y_leaf, z_leaf)
+    cloud_filtered = vox.filter()
+    return cloud_filtered
+
+def passthrough_filter(pcl_cloud, axis_min=0.7, axis_max=1.2, filter_axis='z'):
+    passthrough = pcl_cloud.make_passthrough_filter()
+    # Assign axis and range to the passthrough filter object.
+    passthrough.set_filter_field_name(filter_axis)
+    # Recommended/Example settings: min: 0.6, max: 1.1
+    passthrough.set_filter_limits(axis_min, axis_max)
+    # Finally use the filter function to obtain the resultant point cloud.
+    cloud_filtered = passthrough.filter()
+    return cloud_filtered
+
+def ransac_extract(pcl_cloud, max_distance=0.01, model=pcl.SACMODEL_PLANE, method=pcl.SAC_RANSAC):
+    seg = pcl_cloud.make_segmenter()
+    # Set the model you wish to fit
+    seg.set_model_type(pcl.SACMODEL_PLANE)
+    seg.set_method_type(pcl.SAC_RANSAC)
+    # Max distance for a point to be considered fitting the model
+    seg.set_distance_threshold(max_distance)
+    # Call the segment function to obtain set of inlier indices and model coefficients
+    inliers, coefficients = seg.segment()
+    # Extract inliers
+    extracted_inliers = pcl_cloud.extract(inliers, negative=False)
+    # Extract outliers
+    extracted_outliers = pcl_cloud.extract(inliers, negative=True)
+    return extracted_inliers, extracted_outliers
+
+def cluster_indices(dark_cloud, clusterTolerance=0.01, minClusterSize=40, maxClusterSize=500):
+    # construct a k-d tree from the cloud_objects point cloud
+    tree = dark_cloud.make_kdtree()
+    # Create a cluster extraction object
+    ec = dark_cloud.make_EuclideanClusterExtraction()
+    # Set tolerances for distance threshold
+    # as well as minimum and maximum cluster size (in points)
+    ec.set_ClusterTolerance(clusterTolerance)
+    ec.set_MinClusterSize(minClusterSize)
+    ec.set_MaxClusterSize(maxClusterSize)
+    # Search the k-d tree for clusters
+    ec.set_SearchMethod(tree)
+    # Extract indices for each of the discovered clusters
+    obj_cluster_indices = ec.Extract()
+    return obj_cluster_indices
+
+def oneEuclideanCloud_fromIndices(dark_cloud, obj_cluster_indices_list):
+    cluster_color = get_color_list(len(obj_cluster_indices_list))
+    color_cluster_point_list = []
+    # Assign each point a color based on its cluster affiliation and append to
+    # unified list of colored points
+    for j, indices in enumerate(obj_cluster_indices_list):
+        for indice in indices:
+            color_cluster_point_list.append([dark_cloud[indice][0],
+                                            dark_cloud[indice][1],
+                                            dark_cloud[indice][2],
+                                            rgb_to_float(cluster_color[j])])
+    # Create new cloud containing all clusters,
+    # with each cluster's points now uniquely colored
+    pcl_clustered_cloud = pcl.PointCloud_PointXYZRGB()
+    pcl_clustered_cloud.from_list(color_cluster_point_list)
+    return pcl_clustered_cloud
+
+def objClouds_fromIndices(pcl_cloud, obj_cluster_indices_list):
+    # Assign each point a color based on its cluster affiliation and append to
+    # unified list of colored points
+    cluster_list = []
+    pcl_cloud_list = []
+    for j, indices in enumerate(obj_cluster_indices_list):
+        pcl_cloud_list.append(pcl_cloud.extract(indices))
+        # for indice in indices:
+        #     cluster_list[-1].append([pcl_cloud[indice][0],
+        #                             pcl_cloud[indice][1],
+        #                             pcl_cloud[indice][2],
+        #                             pcl_cloud[indice][3]])
+        # pcl_cloud_gen = pcl.PointCloud_PointXYZRGB()
+        # pcl_cloud_gen.from_list(cluster_list[-1])
+        # pcl_cloud_list.append(pcl_cloud_gen)
+    return pcl_cloud_list
+
 # Callback function for your Point Cloud Subscriber
 def pcl_callback(pcl_msg):
 
