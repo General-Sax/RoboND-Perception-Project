@@ -135,14 +135,13 @@ def pr2_mover(object_list):
 
 
 if __name__ == '__main__':
-
     ### ROS node initialization
     rospy.init_node('clustering', anonymous=True)
 
     ### Create Subscribers
     pcl_sub = rospy.Subscriber("/pr2/world/points", pc2.PointCloud2, pcl_callback, queue_size=1)
 
-    # TODO: Create Publishers
+    # TODO: Create Publishers - What am I supposed to be publishing here?
 
     ### Load Model From disk
     model = pickle.load(open('model.sav', 'rb'))
@@ -151,7 +150,9 @@ if __name__ == '__main__':
     encoder.classes_ = model['classes']
     scaler = model['scaler']
 
-    # Initialize color_list
+    ### Initialize color_list
     get_color_list.color_list = []
 
-    # TODO: Spin while node is not shutdown
+    ### Spin while node is not shutdown
+    while not rospy.is_shutdown():
+        rospy.spin()
