@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 import rospy
 
-from pcl_helper import *
+from sensor_stick.pcl_helper import *
 from sensor_stick.training_helper import spawn_model
 from sensor_stick.training_helper import delete_model
 from sensor_stick.training_helper import initial_setup
