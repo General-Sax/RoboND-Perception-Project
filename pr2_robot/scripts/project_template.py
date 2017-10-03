@@ -191,6 +191,9 @@ def pcl_callback(pcl_msg):
                     minClusterSize=MIN_CLUSTER_SIZE,
                     maxClusterSize=MAX_CLUSTER_SIZE)
     pcl_clustered_cloud = oneEuclideanCloud_fromIndices(dark_cloud, cluster_indices_list)
+
+    ### Create Cluster-Mask Point Cloud to visualize each cluster separately
+    pcl_object_clouds = objClouds_fromIndices(pcl_cloud_objects, cluster_indices_list)
 # Exercise-3 TODOs:
 
     # Classify the clusters! (loop through each detected cluster one at a time)
