@@ -46,6 +46,17 @@ def send_to_yaml(yaml_filename, dict_list):
     with open(yaml_filename, 'w') as outfile:
         yaml.dump(data_dict, outfile, default_flow_style=False)
 
+def statOutlierFilter(pcl_cloud, mean_k=50, threshold_scale=1.0):
+    # Much like the previous filters, we start by creating a filter object:
+    outlier_filter = pcl_cloud.make_statistical_outlier_filter()
+    # Set the number of neighboring points to analyze for any given point
+    outlier_filter.set_mean_k(mean_k)
+    # Any point with a mean distance larger than global (mean distance+x*std_dev) will be considered outlier
+    outlier_filter.set_std_dev_mul_thresh(threshold_scale)
+    # Finally call the filter function for magic
+    cloud_filtered = outlier_filter.filter()
+    return cloud_filtered
+
 def voxel_downsample(pcl_cloud, leaf_scale, coeffs=(1.0, 1.0, 1.0)):
     # leaf_scale: sets default scale for voxel edge, units of meters
     # coeffs: linear scaling factors for edges x, y, z respectively
