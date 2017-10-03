@@ -197,6 +197,9 @@ def pcl_callback(pcl_msg):
 
     ### Convert PCL data to ROS messages
     ros_objects = [pcl_to_ros(pcl_object_clouds[i]) for i in xrange(0, len(pcl_object_clouds))]
+
+    ros_cloud_objects = pcl_to_ros(pcl_clustered_cloud)
+    ros_cloud_table = pcl_to_ros(pcl_cloud_table)
 # Exercise-3 TODOs:
 
     # Classify the clusters! (loop through each detected cluster one at a time)
