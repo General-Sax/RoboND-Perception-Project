@@ -200,6 +200,14 @@ def pcl_callback(pcl_msg):
 
     ros_cloud_objects = pcl_to_ros(pcl_clustered_cloud)
     ros_cloud_table = pcl_to_ros(pcl_cloud_table)
+
+    # Publish ROS messages
+    # confusingly, these publishers send ros PointCloud2 data format, NOT pcl
+    # the pcl label indicates that it's point cloud data in an abstract sense,
+    # and it also indicates that it has been processed with pcl algorithms
+    pcl_objects_pub.publish(ros_cloud_objects)
+    pcl_table_pub.publish(ros_cloud_table)
+
 # Exercise-3 TODOs:
 
     # Classify the clusters! (loop through each detected cluster one at a time)
