@@ -38,7 +38,7 @@ if __name__ == '__main__':
     rospy.init_node('capture_node')
 
     while True:
-        n_orients_input = input("enter number of orientations per object or enter for default ({}): ".format(n_orientations))
+        n_orients_input = str(input("enter number of orientations per object or enter for default ({}): ".format(n_orientations)))
         if n_orients_input.strip() == "":
             print('using default: '+str(n_orientations))
             break
@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
 
     while True:
-        hist_bins_input = input("enter number feature histogram bins, or enter for default ({}): ".format(histogram_bins))
+        hist_bins_input = str(input("enter number feature histogram bins, or enter for default ({}): ".format(histogram_bins)))
         if hist_bins_input.strip() == "":
             print('using default: '+str(histogram_bins))
             break
