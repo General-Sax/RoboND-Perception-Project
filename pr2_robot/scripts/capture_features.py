@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 import rospy
 
-from sensor_stick.pcl_helper import *
+from pcl_helper import *
 from sensor_stick.training_helper import spawn_model
 from sensor_stick.training_helper import delete_model
 from sensor_stick.training_helper import initial_setup
@@ -21,10 +21,56 @@ def get_normals(cloud):
 
 
 if __name__ == '__main__':
-    rospy.init_node('capture_node')
 
     n_orientations = 30
     histogram_bins = 64
+
+    rospy.init_node('capture_node')
+
+    while True:
+        n_orients_input = input("enter number of orientations per object or enter for default ({}): ".format(n_orientations))
+        if n_orients_input.strip() == "":
+            print('using default: '+str(n_orientations))
+            break
+
+        try:
+            n_orientations = int(eval(n_orients_input.strip()))
+        except:
+            print("couldn't convert input to integer; try again!")
+            continue
+
+        if n_orientations <= 0:
+            print('invalid input - enter a nonzero, positive integer!')
+            continue
+        elif n_orientations > 20:
+            print("capture process may take some time; go stretch your legs!")
+            break
+        else:
+            print(str(n_orientations)+" orientations is probably too few to properly train SVM, but here we go!")
+            break
+
+
+    while True:
+        hist_bins_input = input("enter number feature histogram bins, or enter for default ({}): ".format(histogram_bins))
+        if hist_bins_input.strip() == "":
+            print('using default: '+str(histogram_bins))
+            break
+        
+        try:
+            histogram_bins = int(eval(hist_bins_input.strip()))
+        except:
+            print("couldn't convert input to integer; try again!")
+            continue
+
+        if histogram_bins <= 0:
+            print('invalid input - enter a nonzero, positive integer!')
+            continue
+        elif histogram_bins > 256:
+            print('chose a number of bins: 0 < n_bins <= 256')
+            continue
+        else:
+            break
+
 
     models = [\
        'beer',
