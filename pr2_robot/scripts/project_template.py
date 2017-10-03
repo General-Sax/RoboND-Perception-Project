@@ -295,7 +295,7 @@ if __name__ == '__main__':
     ### Create Subscribers
     pcl_sub = rospy.Subscriber("/pr2/world/points", pc2.PointCloud2, pcl_callback, queue_size=1)
 
-    # TODO: Create Publishers - What am I supposed to be publishing here?
+    # TODO: Create Publishers - What am I supposed to be publishing here? Do I need more still?
     pcl_objects_pub = rospy.Publisher("/pcl_objects", PointCloud2, queue_size=1)
     pcl_table_pub = rospy.Publisher("/pcl_table", PointCloud2, queue_size=1)
 
@@ -304,6 +304,11 @@ if __name__ == '__main__':
 
 
     ### Load Model From disk
+    # model = {
+    #  'classes': <list of class name strings>,
+    #  'classifier': <calls sklearn.svm.SVC() class instantiation>
+    #  'scaler': <calls sklearn.preprocessing.StandardScaler() class instantiation>
+    # } # classifier and scaler generated w/saved presets
     model = pickle.load(open('model.sav', 'rb'))
     clf = model['classifier']
     encoder = LabelEncoder()
