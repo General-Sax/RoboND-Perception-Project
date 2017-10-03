@@ -136,7 +136,8 @@ def pr2_mover(object_list):
 
 if __name__ == '__main__':
 
-    # TODO: ROS node initialization
+    ### ROS node initialization
+    rospy.init_node('clustering', anonymous=True)
 
     # TODO: Create Subscribers
 
