@@ -176,6 +176,21 @@ def pcl_callback(pcl_msg):
     ### RANSAC Plane Segmentation
     MAX_DIST = 0.0025
     pcl_cloud_table, pcl_cloud_objects = ransac_extract(pcl_cloud, max_distance=MAX_DIST)
+
+    ### Euclidean Clustering
+    CLUSTER_TOLERANCE = 0.01
+    MIN_CLUSTER_SIZE = 200
+    MAX_CLUSTER_SIZE = 3000
+    # create copy of objects cloud, convert XYZRGB to XYZ
+    # It is dark because it has no color ;)
+    dark_cloud = XYZRGB_to_XYZ(pcl_cloud_objects)
+    # Apply Euclidean clustering and aggregate into single cluster where points
+    # are colored by cluster
+    cluster_indices_list = cluster_indices(dark_cloud,
+                    clusterTolerance=CLUSTER_TOLERANCE,
+                    minClusterSize=MIN_CLUSTER_SIZE,
+                    maxClusterSize=MAX_CLUSTER_SIZE)
+    pcl_clustered_cloud = oneEuclideanCloud_fromIndices(dark_cloud, cluster_indices_list)
 # Exercise-3 TODOs:
 
     # Classify the clusters! (loop through each detected cluster one at a time)
