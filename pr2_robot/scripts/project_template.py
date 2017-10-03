@@ -52,7 +52,7 @@ def pcl_callback(pcl_msg):
 # Exercise-2 TODOs:
 
     # TODO: Convert ROS msg to PCL data
-    
+
     # TODO: Statistical Outlier Filtering
 
     # TODO: Voxel Grid Downsampling
@@ -142,7 +142,12 @@ if __name__ == '__main__':
 
     # TODO: Create Publishers
 
-    # TODO: Load Model From disk
+    ### Load Model From disk
+    model = pickle.load(open('model.sav', 'rb'))
+    clf = model['classifier']
+    encoder = LabelEncoder()
+    encoder.classes_ = model['classes']
+    scaler = model['scaler']
 
     # Initialize color_list
     get_color_list.color_list = []
