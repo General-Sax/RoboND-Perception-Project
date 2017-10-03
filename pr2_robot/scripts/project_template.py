@@ -238,6 +238,7 @@ if __name__ == '__main__':
 
     # TODO: Create Publishers - What am I supposed to be publishing here?
 
+
     ### Load Model From disk
     model = pickle.load(open('model.sav', 'rb'))
     clf = model['classifier']
