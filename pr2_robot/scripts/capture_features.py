@@ -15,6 +15,8 @@ from geometry_msgs.msg import Pose
 from sensor_msgs.msg import PointCloud2
 
 
+histogram_bins_record = True
+
 def get_normals(cloud):
     get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
     return get_normals_prox(cloud).cluster
@@ -55,7 +57,7 @@ if __name__ == '__main__':
         if hist_bins_input.strip() == "":
             print('using default: '+str(histogram_bins))
             break
-        
+
         try:
             histogram_bins = int(eval(hist_bins_input.strip()))
         except:
@@ -71,6 +73,11 @@ if __name__ == '__main__':
         else:
             break
 
+    if histogram_bins_record:
+        with open('model_hist_bin_count.txt', 'w') as record:
+            record.writeline(str(histogram_bins))
+    else:
+        pass
 
     models = [\
        'beer',
