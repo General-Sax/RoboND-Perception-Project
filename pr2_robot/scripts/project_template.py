@@ -176,6 +176,18 @@ def pcl_callback(pcl_msg):
     LEAF_SCALE = 0.005 # meters per voxel_edge
     XYZ_VOXEL_COEFFS=(1.0, 1.0, 1.0) # scale xyz dimensions of voxel independently
     pcl_cloud = voxel_downsample(pcl_cloud, leaf_scale=LEAF_SCALE, coeffs=XYZ_VOXEL_COEFFS)
+    ### PassThrough Filter
+    Z_AXIS_MIN = 0.7
+    Z_AXIS_MAX = 1.2
+    Y_AXIS_MIN = -0.45
+    Y_AXIS_MAX = -0.45
+    X_AXIS_MIN = 0.3
+    X_AXIS_MAX = 0.9
+    # passthrough filter out the approximate height of the table surface and objects
+    pcl_cloud = passthrough_filter(pcl_cloud, axis_min=Z_AXIS_MIN, axis_max=Z_AXIS_MAX, filter_axis='z')
+    # passthrough filter out the xy-range which corresponds to the table
+    pcl_cloud = passthrough_filter(pcl_cloud, axis_min=Y_AXIS_MIN, axis_max=Y_AXIS_MAX, filter_axis='y')
+    pcl_cloud = passthrough_filter(pcl_cloud, axis_min=X_AXIS_MIN, axis_max=X_AXIS_MAX, filter_axis='x')
 # Exercise-3 TODOs:
 
     # Classify the clusters! (loop through each detected cluster one at a time)
