@@ -172,6 +172,10 @@ def pcl_callback(pcl_msg):
     # passthrough filter out the xy-range which corresponds to the table
     pcl_cloud = passthrough_filter(pcl_cloud, axis_min=Y_AXIS_MIN, axis_max=Y_AXIS_MAX, filter_axis='y')
     pcl_cloud = passthrough_filter(pcl_cloud, axis_min=X_AXIS_MIN, axis_max=X_AXIS_MAX, filter_axis='x')
+
+    ### RANSAC Plane Segmentation
+    MAX_DIST = 0.0025
+    pcl_cloud_table, pcl_cloud_objects = ransac_extract(pcl_cloud, max_distance=MAX_DIST)
 # Exercise-3 TODOs:
 
     # Classify the clusters! (loop through each detected cluster one at a time)
