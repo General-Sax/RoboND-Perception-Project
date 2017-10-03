@@ -16,6 +16,14 @@ from sensor_msgs.msg import PointCloud2
 
 
 histogram_bins_record = True
+listnumber = 1
+
+
+pick_list_ = {1: ['biscuits', 'soap', 'soap2'],
+              2: ['biscuits', 'soap', 'soap2', 'glue'],
+              3: ['sticky_notes', 'book', 'snacks', 'biscuits',
+                  'eraser', 'soap2', 'soap', 'glue']
+             }
 
 def get_normals(cloud):
     get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
@@ -79,20 +87,13 @@ if __name__ == '__main__':
     else:
         pass
 
-    models = [\
-       'beer',
-       'bowl',
-       'create',
-       'disk_part',
-       'hammer',
-       'plastic_cup',
-       'soda_can']
+    object_models = pick_list_[listnumber]
 
     # Disable gravity and delete the ground plane
     initial_setup()
     labeled_features = []
 
-    for model_name in models:
+    for model_name in object_models:
         spawn_model(model_name)
         print(model_name)
         for i in range(n_orientations):
