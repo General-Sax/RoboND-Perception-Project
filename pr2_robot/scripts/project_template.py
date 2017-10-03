@@ -149,23 +149,6 @@ def pcl_callback(pcl_msg):
     ### Convert ROS msg to PCL data
     pcl_cloud = ros_to_pcl(pcl_msg)
 
-    # TODO: Statistical Outlier Filtering
-
-    # TODO: Voxel Grid Downsampling
-
-    # TODO: PassThrough Filter
-
-    # TODO: RANSAC Plane Segmentation
-
-    # TODO: Extract inliers and outliers
-
-    # TODO: Euclidean Clustering
-
-    # TODO: Create Cluster-Mask Point Cloud to visualize each cluster separately
-
-    # TODO: Convert PCL data to ROS messages
-
-    # TODO: Publish ROS messages
     ### Statistical Outlier Filtering
     MEAN_K = 80
     THRESHOLD_SCALE = 0.8
@@ -176,6 +159,7 @@ def pcl_callback(pcl_msg):
     LEAF_SCALE = 0.005 # meters per voxel_edge
     XYZ_VOXEL_COEFFS=(1.0, 1.0, 1.0) # scale xyz dimensions of voxel independently
     pcl_cloud = voxel_downsample(pcl_cloud, leaf_scale=LEAF_SCALE, coeffs=XYZ_VOXEL_COEFFS)
+
     ### PassThrough Filter
     Z_AXIS_MIN = 0.7
     Z_AXIS_MAX = 1.2
