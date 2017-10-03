@@ -171,6 +171,11 @@ def pcl_callback(pcl_msg):
     THRESHOLD_SCALE = 0.8
     pcl_cloud = statOutlierFilter(pcl_cloud, mean_k=MEAN_K, threshold_scale=THRESHOLD_SCALE)
 
+    ### Voxel Grid Downsampling
+    # Choose a voxel (also known as leaf) size
+    LEAF_SCALE = 0.005 # meters per voxel_edge
+    XYZ_VOXEL_COEFFS=(1.0, 1.0, 1.0) # scale xyz dimensions of voxel independently
+    pcl_cloud = voxel_downsample(pcl_cloud, leaf_scale=LEAF_SCALE, coeffs=XYZ_VOXEL_COEFFS)
 # Exercise-3 TODOs:
 
     # Classify the clusters! (loop through each detected cluster one at a time)
