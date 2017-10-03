@@ -315,6 +315,18 @@ if __name__ == '__main__':
     encoder.classes_ = model['classes']
     scaler = model['scaler']
 
+    N_BINS = 64
+    try:
+        with open('model_hist_bin_count.txt', 'r') as record:
+            n_hist_bins = int(eval(record.readline().strip()))
+            print('successfully loaded histogram bins from shared record')
+            if 256 >= n_hist_bins > 0:
+                N_BINS = n_hist_bins
+            else:
+                print('loaded N_BINS value out of range; N_BINS defaulted to: '+str(N_BINS))
+    except:
+        print('histogram count loading failed; N_BINS defaulted to: '+str(N_BINS))
+
     ### Initialize color_list
     get_color_list.color_list = []
 
