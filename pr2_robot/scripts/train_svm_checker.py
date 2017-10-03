@@ -34,6 +34,7 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    
 
 # Load training data from disk
 training_set = pickle.load(open('training_set.sav', 'rb'))
