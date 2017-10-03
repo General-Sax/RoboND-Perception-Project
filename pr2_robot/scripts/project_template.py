@@ -24,6 +24,7 @@ from pr2_robot.srv import *
 from rospy_message_converter import message_converter
 import yaml
 
+histogram_bins_record = True
 
 # Helper function to get surface normals
 def get_normals(cloud):
@@ -289,6 +290,7 @@ def pr2_mover(object_list):
 
 
 if __name__ == '__main__':
+
     ### ROS node initialization
     rospy.init_node('clustering', anonymous=True)
 
