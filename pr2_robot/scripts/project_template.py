@@ -194,6 +194,9 @@ def pcl_callback(pcl_msg):
 
     ### Create Cluster-Mask Point Cloud to visualize each cluster separately
     pcl_object_clouds = objClouds_fromIndices(pcl_cloud_objects, cluster_indices_list)
+
+    ### Convert PCL data to ROS messages
+    ros_objects = [pcl_to_ros(pcl_object_clouds[i]) for i in xrange(0, len(pcl_object_clouds))]
 # Exercise-3 TODOs:
 
     # Classify the clusters! (loop through each detected cluster one at a time)
