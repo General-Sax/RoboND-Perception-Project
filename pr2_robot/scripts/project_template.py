@@ -145,7 +145,6 @@ def objClouds_fromIndices(pcl_cloud, obj_cluster_indices_list):
 def pcl_callback(pcl_msg):
 
 # Exercise-2 TODOs:
-
     ### Convert ROS msg to PCL data
     pcl_cloud = ros_to_pcl(pcl_msg)
 
@@ -209,20 +208,38 @@ def pcl_callback(pcl_msg):
     pcl_table_pub.publish(ros_cloud_table)
 
 # Exercise-3 TODOs:
-
     # Classify the clusters! (loop through each detected cluster one at a time)
-
+    detected_objects_labels = []
+    detected_objects = []
+    for i, pts_list in enumerate(cluster_indices_list):
         # Grab the points for the cluster
-
+        ros_cloud = ros_objects[i]
         # Compute the associated feature vector
-
+        hsv_hists = compute_color_histograms(ros_cloud, nbins=N_BINS, using_hsv=True)
+        rgb_hists = compute_color_histograms(ros_cloud, nbins=N_BINS, using_hsv=False)
+        normals = get_normals(ros_cloud)
+        nhists = compute_normal_histograms(normals, nbins=N_BINS)
+        feature = np.concatenate((rgb_hists, hsv_hists, nhists))
         # Make the prediction
+        prediction = clf.predict(scaler.transform(feature.reshape(1,-1)))
+        label = encoder.inverse_transform(prediction)[0]
+        detected_objects_labels.append(label)
 
         # Publish a label into RViz
+        label_pos = list(dark_cloud[pts_list[0]])
+        label_pos[2] += .4
+        object_markers_pub.publish(make_label(label, label_pos, i))
 
         # Add the detected object to the list of detected objects.
+        do = DetectedObject()
+        do.label = label
+        do.cloud = ros_cloud
+        detected_objects.append(do)
+
+    rospy.loginfo('Detected {} objects: {}'.format(len(detected_objects_labels), detected_objects_labels))
 
     # Publish the list of detected objects
+    detected_objects_pub.publish(detected_objects)
 
     # Suggested location for where to invoke your pr2_mover() function within pcl_callback()
     # Could add some logic to determine whether or not your object detections are robust
