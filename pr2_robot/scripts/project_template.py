@@ -165,6 +165,10 @@ def pcl_callback(pcl_msg):
     # TODO: Convert PCL data to ROS messages
 
     # TODO: Publish ROS messages
+    ### Statistical Outlier Filtering
+    MEAN_K = 80
+    THRESHOLD_SCALE = 0.8
+    pcl_cloud = statOutlierFilter(pcl_cloud, mean_k=MEAN_K, threshold_scale=THRESHOLD_SCALE)
 
 # Exercise-3 TODOs:
 
