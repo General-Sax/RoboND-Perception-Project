@@ -22,4 +22,15 @@
   <node name="cloud_transformer" pkg="pr2_robot" type="pr2_cloud_transformer"
     respawn="false" output="screen"/>
 
+  <!-- node name="pr2_cloud_transformer" pkg="pr2_robot" type="pr2_cloud_transformer"
+    respawn="false" output="screen">
+    <param name="demo" type="bool" value="false"/>
+  </node -->
+
+  <!-- The feature extractor node -->
+  <!-- node name="feature_extractor" pkg="sensor_stick" type="feature_extractor" respawn="false"/ -->
+
+  <!-- Load in complete pick list -->
+  <!-- rosparam command="load" file="$(find pr2_robot)/config/pick_list_3.yaml"/ -->
+
 </launch>
