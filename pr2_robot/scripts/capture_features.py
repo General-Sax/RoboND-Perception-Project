@@ -125,4 +125,4 @@ if __name__ == '__main__':
         delete_model()
 
 
-    pickle.dump(labeled_features, open('training_set.sav', 'wb'))
+    pickle.dump(labeled_features, open('o{}_h{}_training_set.sav'.format(n_orientations, histogram_bins), 'wb'))
