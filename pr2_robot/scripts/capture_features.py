@@ -14,6 +14,7 @@ from sensor_stick.srv import GetNormals
 from geometry_msgs.msg import Pose
 from sensor_msgs.msg import PointCloud2
 
+save_dir = './savefiles/'
 
 object_models = [\
     'sticky_notes',
@@ -114,4 +115,4 @@ if __name__ == '__main__':
         delete_model()
 
 
-    pickle.dump(labeled_features, open('o{}_h{}_training_set.sav'.format(n_orientations, histogram_bins), 'wb'))
+    pickle.dump(labeled_features, open(save_dir+'o{}_h{}_training_set.sav'.format(n_orientations, histogram_bins), 'wb'))
