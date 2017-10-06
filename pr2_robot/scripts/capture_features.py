@@ -87,10 +87,13 @@ if __name__ == '__main__':
 
     labeled_features = []
 
-    for model_name in object_models:
+    for ind, model_name in enumerate(object_models):
+        delete_model()
         spawn_model(model_name)
 
         for i in range(n_orientations):
+            pct = ((ind * n_orientations) + i) / (8 * n_orientations)
+            print(str(pct)+"%% - [ "+model_name+" : model "+str(ind+1)+" of 8 ] orientation ( "+str(i)+" of "+str(n_orientations)+" )")
             # make five attempts to get a valid a point cloud then give up
             sample_was_good = False
             try_count = 0
