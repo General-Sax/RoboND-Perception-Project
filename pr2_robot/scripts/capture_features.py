@@ -4,10 +4,6 @@ import pickle
 import rospy
 
 from sensor_stick.pcl_helper import *
-# from sensor_stick.training_helper import spawn_model
-# from sensor_stick.training_helper import delete_model
-# from sensor_stick.training_helper import initial_setup
-# from sensor_stick.training_helper import capture_sample
 from training_helper import spawn_model
 from training_helper import delete_model
 from training_helper import initial_setup
