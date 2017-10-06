@@ -23,7 +23,6 @@ pick_list_ = {1: ['biscuits', 'soap', 'soap2'],
               3: ['sticky_notes', 'book', 'snacks', 'biscuits',
                   'eraser', 'soap2', 'soap', 'glue']
              }
-# histogram_bins_record = True
 
 def get_normals(cloud):
     get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
@@ -81,11 +80,6 @@ if __name__ == '__main__':
         else:
             break
 
-    # if histogram_bins_record:
-    #     with open('model_hist_bin_count.txt', 'w') as record:
-    #         record.write(str(histogram_bins))
-    # else:
-    #     pass
 
     object_models = pick_list_[listnumber]
 
