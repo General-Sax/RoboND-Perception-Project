@@ -112,7 +112,6 @@ if __name__ == '__main__':
             feature = np.concatenate((rgb_hists, hsv_hists, nhists))
             labeled_features.append([feature, model_name])
 
-        delete_model()
-
+    delete_model()
 
     pickle.dump(labeled_features, open(save_dir+'o{}_h{}_training_set.sav'.format(n_orientations, histogram_bins), 'wb'))
