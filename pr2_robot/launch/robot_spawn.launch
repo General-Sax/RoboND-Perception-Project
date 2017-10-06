@@ -28,7 +28,7 @@
   </node -->
 
   <!-- The feature extractor node -->
-  <!-- node name="feature_extractor" pkg="sensor_stick" type="feature_extractor" respawn="false"/ -->
+  <node name="feature_extractor" pkg="sensor_stick" type="feature_extractor" respawn="false"/>
 
   <!-- Load in complete pick list -->
   <!-- rosparam command="load" file="$(find pr2_robot)/config/pick_list_3.yaml"/ -->
