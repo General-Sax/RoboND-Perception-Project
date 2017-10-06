@@ -38,6 +38,6 @@ Thumbs.db
 
 # Saved Project Objects #
 #########################
-.breadcrumb
-.sav
-.pcd
+*.breadcrumb
+*.sav
+*.pcd
