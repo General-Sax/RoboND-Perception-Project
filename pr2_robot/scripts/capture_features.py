@@ -15,14 +15,15 @@ from geometry_msgs.msg import Pose
 from sensor_msgs.msg import PointCloud2
 
 
-listnumber = 1
-
-
-pick_list_ = {1: ['biscuits', 'soap', 'soap2'],
-              2: ['biscuits', 'soap', 'soap2', 'glue'],
-              3: ['sticky_notes', 'book', 'snacks', 'biscuits',
-                  'eraser', 'soap2', 'soap', 'glue']
-             }
+object_models = [\
+    'sticky_notes',
+    'book',
+    'snacks',
+    'biscuits',
+    'eraser',
+    'soap2',
+    'soap',
+    'glue']
 
 def get_normals(cloud):
     get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
@@ -80,11 +81,9 @@ if __name__ == '__main__':
         else:
             break
 
-
-    object_models = pick_list_[listnumber]
-
     # Disable gravity and delete the ground plane
     initial_setup()
+
     labeled_features = []
 
     for model_name in object_models:
