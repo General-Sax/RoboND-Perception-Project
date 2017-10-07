@@ -41,3 +41,7 @@ Thumbs.db
 *.breadcrumb
 *.sav
 *.pcd
+
+# PyCharm project repository #
+##############################
+.idea/
