@@ -1,5 +1,8 @@
 #! /bin/bash
 # This script safely launches ros nodes with buffer time to allow param server population
+
+rm 1.breadcrumb 2.breadcrumb 3.breadcrumb
+
 while true
 do
 
@@ -22,6 +25,8 @@ else
 fi
 
 done
+
+touch "$selection".breadcrumb
 
 x-terminal-emulator -e roslaunch pr2_robot $project & sleep 10 &&
 x-terminal-emulator -e roslaunch pr2_moveit pr2_moveit.launch & sleep 20 &&
