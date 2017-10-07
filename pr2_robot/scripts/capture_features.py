@@ -14,8 +14,13 @@ from sensor_stick.srv import GetNormals
 from geometry_msgs.msg import Pose
 from sensor_msgs.msg import PointCloud2
 
+# Where to put the training_set pickle when it's been cooked up
 save_dir = './savefiles/'
 
+# Toggles use of the cli setup logic to customize parameters
+UI_PROMPTING = True
+
+# Single complete list of all objects in the project
 object_models = [\
     'sticky_notes',
     'book',
@@ -33,12 +38,13 @@ def get_normals(cloud):
 
 if __name__ == '__main__':
 
+    # set defaults
     n_orientations = 30
     histogram_bins = 64
 
     rospy.init_node('capture_node')
 
-    while True:
+    while UI_PROMPTING:
         n_orients_input = str(input("enter number of orientations per object or enter for default ({}): ".format(n_orientations)))
         if n_orients_input.strip() == "":
             print('using default: '+str(n_orientations))
@@ -60,8 +66,7 @@ if __name__ == '__main__':
             print(str(n_orientations)+" orientations is probably too few to properly train SVM, but here we go!")
             break
 
-
-    while True:
+    while UI_PROMPTING:
         hist_bins_input = str(input("enter number feature histogram bins, or enter for default ({}): ".format(histogram_bins)))
         if hist_bins_input.strip() == "":
             print('using default: '+str(histogram_bins))
