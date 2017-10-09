@@ -64,12 +64,6 @@ encoder = LabelEncoder()
 y_train = encoder.fit_transform(y_train)
 
 # Create classifier
-kernels = ['linear', 'rbf', 'poly', 'sigmoid']
-results = {}
-# krnl = 'linear'
-# krnl = 'rbf'
-# krnl = 'poly'
-# krnl = 'sigmoid'
 for krnl in kernels:
   print("\n"+krnl)
   clf = svm.SVC(kernel=krnl)
@@ -111,6 +105,9 @@ kf = cross_validation.KFold(len(X_train),
                             n_folds=5,
                             shuffle=True,
                             random_state=1)
+if __name__ == "__main__":
+    print("\nTraining and selecting SVMs for all test data sets!")
+    kernels = ['linear', 'rbf', 'poly', 'sigmoid']
 
 predictions = cross_validation.cross_val_predict(cv=kf,
                                           estimator=clf,
