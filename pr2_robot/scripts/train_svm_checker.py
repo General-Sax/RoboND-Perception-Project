@@ -40,11 +40,6 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    
-
-# Load training data from disk
-training_set = pickle.load(open('training_set.sav', 'rb'))
-
 # Format the features and labels for use with scikit learn
 feature_list = []
 label_list = []
@@ -134,9 +129,6 @@ clf.fit(X=X_train, y=y_train)
 
 model = {'classifier': clf, 'classes': encoder.classes_, 'scaler': X_scaler}
 
-# Save classifier to disk
-pickle.dump(model, open('model.sav', 'wb'))
-
 # Plot non-normalized confusion matrix
 plt.figure()
 plot_confusion_matrix(confusion_matrix, classes=encoder.classes_,
@@ -148,3 +140,9 @@ plot_confusion_matrix(confusion_matrix, classes=encoder.classes_, normalize=True
                       title='Normalized confusion matrix')
 
 plt.show()
+    # Load training data from disk
+    training_set = glob.glob(save_dir+'*_training_set.sav')[0]
+    orientation_ct = training_set.split('_')[0]
+    n_bins = training_set.split('_')[1]
+    training_set = pickle.load(open(training_set, 'rb'))
+    np.random.shuffle(training_set) # a pre-shuffle for good luck
