@@ -2,7 +2,7 @@
   <!--Include description and control launch files-->
   <include file="$(find pr2_robot)/launch/robot_description.launch"/>
   <include file="$(find pr2_robot)/launch/robot_control.launch"/>
-  <include file="$(find pr2_moveit)/launch/move_group.launch"/>
+  <!--<include file="$(find pr2_moveit)/launch/move_group.launch"/>-->
 
   <rosparam command="load" file="$(find pr2_moveit)/config/grasp.yaml"/>
   <rosparam command="load" file="$(find pr2_robot)/config/dropbox.yaml"/>
