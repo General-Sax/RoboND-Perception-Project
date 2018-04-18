@@ -3,22 +3,22 @@ object_list:
   object_name: sticky_notes
   pick_pose:
     orientation:
-      w: 0.0
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
     position:
-      x: 0.4394523799419403
-      y: 0.21348296105861664
-      z: 0.686417281627655
+      x: 0.44
+      y: 0.21
+      z: 0.69
   place_pose:
     orientation:
-      w: 0.0
+      w: 1.0
       x: 0.0
       y: 0.0
       z: 0.0
     position:
-      x: -0.02
+      x: 0.0
       y: 0.71
       z: 0.7
   test_scene_num: 3
@@ -26,22 +26,22 @@ object_list:
   object_name: book
   pick_pose:
     orientation:
-      w: 0.0
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
     position:
-      x: 0.46119245886802673
-      y: -0.3564910888671875
-      z: 0.8245747089385986
+      x: 0.48
+      y: 0.07
+      z: 0.77
   place_pose:
     orientation:
-      w: 0.0
+      w: 1.0
       x: 0.0
       y: 0.0
       z: 0.0
     position:
-      x: -0.02
+      x: 0.0
       y: 0.71
       z: 0.7
   test_scene_num: 3
@@ -49,22 +49,45 @@ object_list:
   object_name: snacks
   pick_pose:
     orientation:
-      w: 0.0
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
     position:
-      x: 0.4223727881908417
-      y: -0.3380607068538666
-      z: 0.9264337420463562
+      x: 0.43
+      y: -0.31
+      z: 0.77
   place_pose:
     orientation:
-      w: 0.0
+      w: 1.0
       x: 0.0
       y: 0.0
       z: 0.0
     position:
-      x: -0.02
+      x: 0.0
+      y: -0.71
+      z: 0.7
+  test_scene_num: 3
+- arm_name: right
+  object_name: biscuits
+  pick_pose:
+    orientation:
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
+    position:
+      x: 0.58
+      y: -0.2
+      z: 0.72
+  place_pose:
+    orientation:
+      w: 1.0
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    position:
+      x: 0.0
       y: -0.71
       z: 0.7
   test_scene_num: 3
@@ -72,22 +95,22 @@ object_list:
   object_name: eraser
   pick_pose:
     orientation:
-      w: 0.0
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
     position:
-      x: 0.6078177094459534
-      y: 0.28005364537239075
-      z: 0.6462341547012329
+      x: 0.61
+      y: 0.28
+      z: 0.65
   place_pose:
     orientation:
-      w: 0.0
+      w: 1.0
       x: 0.0
       y: 0.0
       z: 0.0
     position:
-      x: -0.02
+      x: 0.0
       y: 0.71
       z: 0.7
   test_scene_num: 3
@@ -95,22 +118,22 @@ object_list:
   object_name: soap2
   pick_pose:
     orientation:
-      w: 0.0
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
     position:
-      x: 0.45295965671539307
-      y: -0.04305779188871384
-      z: 0.6776564717292786
+      x: 0.45
+      y: -0.05
+      z: 0.69
   place_pose:
     orientation:
-      w: 0.0
+      w: 1.0
       x: 0.0
       y: 0.0
       z: 0.0
     position:
-      x: -0.02
+      x: 0.0
       y: -0.71
       z: 0.7
   test_scene_num: 3
@@ -118,22 +141,22 @@ object_list:
   object_name: soap
   pick_pose:
     orientation:
-      w: 0.0
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
     position:
-      x: 0.6781675815582275
-      y: 0.0037179107312113047
-      z: 0.6751353740692139
+      x: 0.68
+      y: 0.01
+      z: 0.69
   place_pose:
     orientation:
-      w: 0.0
+      w: 1.0
       x: 0.0
       y: 0.0
       z: 0.0
     position:
-      x: -0.02
+      x: 0.0
       y: -0.71
       z: 0.7
   test_scene_num: 3
@@ -141,22 +164,22 @@ object_list:
   object_name: glue
   pick_pose:
     orientation:
-      w: 0.0
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
     position:
-      x: 0.6114126443862915
-      y: 0.14148971438407898
-      z: 0.68450927734375
+      x: 0.61
+      y: 0.14
+      z: 0.69
   place_pose:
     orientation:
-      w: 0.0
+      w: 1.0
       x: 0.0
       y: 0.0
       z: 0.0
     position:
-      x: -0.02
+      x: 0.0
       y: 0.71
       z: 0.7
   test_scene_num: 3

@@ -3,22 +3,22 @@ object_list:
   object_name: biscuits
   pick_pose:
     orientation:
-      w: 0.0
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
     position:
-      x: 0.5407688021659851
-      y: -0.240866556763649
-      z: 0.701876163482666
+      x: 0.54
+      y: -0.24
+      z: 0.7
   place_pose:
     orientation:
-      w: 0.0
+      w: 1.0
       x: 0.0
       y: 0.0
       z: 0.0
     position:
-      x: -0.02
+      x: 0.0
       y: -0.71
       z: 0.7
   test_scene_num: 1
@@ -26,22 +26,22 @@ object_list:
   object_name: soap
   pick_pose:
     orientation:
-      w: 0.0
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
     position:
-      x: 0.5441750288009644
-      y: -0.018301066011190414
-      z: 0.6756218075752258
+      x: 0.55
+      y: -0.02
+      z: 0.7
   place_pose:
     orientation:
-      w: 0.0
+      w: 1.0
       x: 0.0
       y: 0.0
       z: 0.0
     position:
-      x: -0.02
+      x: 0.0
       y: -0.71
       z: 0.7
   test_scene_num: 1
@@ -49,22 +49,22 @@ object_list:
   object_name: soap2
   pick_pose:
     orientation:
-      w: 0.0
-      x: 0.0
-      y: 0.0
-      z: 0.0
+      w: 0.5
+      x: 0.5
+      y: 0.5
+      z: -0.5
     position:
-      x: 0.44472596049308777
-      y: 0.22014892101287842
-      z: 0.6762336492538452
+      x: 0.44
+      y: 0.22
+      z: 0.68
   place_pose:
     orientation:
-      w: 0.0
+      w: 1.0
       x: 0.0
       y: 0.0
       z: 0.0
     position:
-      x: -0.02
+      x: 0.0
       y: 0.71
       z: 0.7
   test_scene_num: 1
