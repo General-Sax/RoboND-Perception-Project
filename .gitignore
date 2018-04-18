@@ -36,6 +36,11 @@
 ehthumbs.db
 Thumbs.db
 
+
+# pycharm project repo
+.idea/
+
+
 # Saved Project Objects #
 #########################
 *.breadcrumb
