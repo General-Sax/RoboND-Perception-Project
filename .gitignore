@@ -49,7 +49,7 @@ Thumbs.db
 
 
 # compiled cython
-.pyc
+*.pyc
 
 
 
