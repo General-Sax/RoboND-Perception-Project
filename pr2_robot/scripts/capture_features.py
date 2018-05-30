@@ -15,13 +15,14 @@ from geometry_msgs.msg import Pose
 from sensor_msgs.msg import PointCloud2
 
 # Where to put the training_set pickle when it's been cooked up
-save_dir = './savefiles/'
+SAVE_DIR = './savefiles/'
 
 # Toggles use of the cli setup logic to customize parameters
 UI_PROMPTING = True
 
 # Single complete list of all objects in the project
-object_models = [
+
+PROJECT_MODELS = [
     'sticky_notes',
     'book',
     'snacks',
@@ -94,7 +95,7 @@ if __name__ == '__main__':
 
     labeled_features = []
 
-    for ind, model_name in enumerate(object_models):
+    for ind, model_name in enumerate(models):
         delete_model()
         spawn_model(model_name)
 
@@ -124,4 +125,7 @@ if __name__ == '__main__':
 
     delete_model()
 
-    pickle.dump(labeled_features, open(save_dir +'o{}_h{}_training_set.sav'.format(ORIENTATIONS_PER_OBJECT, N_HIST_BINS), 'wb'))
+    features_filename = 'o{}_h{}_training_set.sav'.format(ORIENTATIONS_PER_OBJECT, N_HIST_BINS)
+
+    pickle.dump(labeled_features, open(save_dir + features_filename, 'wb'))
+
