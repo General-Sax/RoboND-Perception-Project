@@ -1,23 +1,27 @@
 #!/usr/bin/env python
 
 # Import modules
-import numpy as np
-import sklearn
-from sklearn.preprocessing import LabelEncoder
+import glob
+import time
 import pickle
+
+import yaml
+import rospy
+import tf
+# import pcl # <- was previously arriving via 'from sensor_stick.pcl_helper import *', not currently working.
+import sklearn
+import numpy as np
+
+from sklearn.preprocessing import LabelEncoder
+
 from sensor_stick.srv import GetNormals
 from sensor_stick.features import compute_color_histograms
 from sensor_stick.features import compute_normal_histograms
-from visualization_msgs.msg import Marker
 from sensor_stick.marker_tools import *
 from sensor_stick.msg import DetectedObjectsArray
 from sensor_stick.msg import DetectedObject
 from sensor_stick.pcl_helper import *
-
-import rospy
-import tf
-import glob
-import time
+from visualization_msgs.msg import Marker
 from geometry_msgs.msg import Pose
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64
@@ -25,7 +29,8 @@ from std_msgs.msg import Int32
 from std_msgs.msg import String
 from pr2_robot.srv import *
 from rospy_message_converter import message_converter
-import yaml
+
+
 
 save_dir = './savefiles/'
 
@@ -225,7 +230,6 @@ def pivot_bot(world_joint_goal, absolute_angle_tolerance, auto_recenter=True):
 
     print(output_text)
     return
-
 
 # Helper function to create a yaml friendly dictionary from ROS messages
 def make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose):
@@ -463,6 +467,7 @@ def pr2_mover(object_list, pcl_cloud):
 
         try:
             pick_place_routine = rospy.ServiceProxy('pick_place_routine', PickPlace)
+
             # TODO: Insert your message variables to be sent as a service request
             resp = pick_place_routine(TEST_SCENE_NUM, OBJECT_NAME, ARM_NAME, PICK_POSE, PLACE_POSE)
             print("Response: ",resp.success)
