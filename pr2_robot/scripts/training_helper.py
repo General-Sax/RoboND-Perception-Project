@@ -28,13 +28,11 @@ from sensor_msgs.msg import PointCloud2
 
 
 def capture_sample():
-    """ Captures a PointCloud2 using the sensor stick RGBD camera
-
-        Args: None
-
-        Returns:
-            PointCloud2: a single point cloud from the RGBD camrea
-    """
+    '''
+    Captures a PointCloud2 object using the sensor stick RGBD camera.
+    
+    :return: PointCloud2 - a single RGBD point cloud measurement
+    '''
     get_model_state_prox = rospy.ServiceProxy('gazebo/get_model_state',GetModelState)
     model_state = get_model_state_prox('training_model','world')
 
@@ -59,18 +57,17 @@ def capture_sample():
 
 
 def initial_setup():
-    """ Prepares the Gazebo world for generating training data.
+    '''
+    Prepares the Gazebo world for generating training data.
 
-        In particular, this routine turns off gravity, so that the objects
-        spawned in front of the RGBD camera will not fall. It also deletes
-        the ground plane, so that the only depth points produce will
-        correspond to the object of interest (eliminating the need for
-        clustering and segmentation as part of the trianing process)
-
-        Args: None
-
-        Returns: None
-    """
+    In particular, this routine turns off gravity, so that the objects
+    spawned in front of the RGBD camera will not fall. It also deletes
+    the ground plane, so that the only depth points produced will
+    correspond to the object of interest (eliminating the need for
+    clustering and segmentation as part of the training process)
+    
+    :return: None
+    '''
     rospy.wait_for_service('gazebo/get_model_state')
     rospy.wait_for_service('gazebo/set_model_state')
     rospy.wait_for_service('gazebo/get_physics_properties')
@@ -88,7 +85,6 @@ def initial_setup():
                                 physics_properties.gravity,
                                 physics_properties.ode_config)
 
-
     delete_model_prox = rospy.ServiceProxy('gazebo/delete_model', DeleteModel)
     try:
         delete_model_prox('ground_plane')
@@ -98,12 +94,12 @@ def initial_setup():
 
 
 def spawn_model(model_name):
-    """ Spawns a model in front of the RGBD camera.
-
-        Args: None
-
-        Returns: None
-    """
+    '''
+    Spawns a model in front of the RGBD camera.
+    
+    :param model_name: valid object name from {sticky_notes, book, snacks, biscuits, eraser, soap2, soap, glue}
+    :return: None
+    '''
     initial_pose = Pose()
     initial_pose.position.x = 0.6
     initial_pose.position.y = 0
@@ -120,7 +116,13 @@ def spawn_model(model_name):
     spawn_model_prox('training_model', model_xml, '', initial_pose, 'world')
 
 
+
 def delete_model():
-    # Delete the old model if it's stil around
+    '''
+    Deletes whichever model is currently being rendered in gazebo as 'training_model'
+    :return: None
+    '''
     delete_model_prox = rospy.ServiceProxy('gazebo/delete_model', DeleteModel)
+    
+    # Delete the old model if it's stil around:
     delete_model_prox('training_model')
