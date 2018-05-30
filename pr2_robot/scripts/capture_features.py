@@ -39,8 +39,8 @@ def get_normals(cloud):
 
 if __name__ == '__main__':
     # set defaults
-    n_orientations = 30
-    histogram_bins = 64
+    ORIENTATIONS_PER_OBJECT = 30
+    N_HIST_BINS = 64
 
     rospy.init_node('capture_node')
 
@@ -49,41 +49,41 @@ if __name__ == '__main__':
             "enter number of orientations per object or <enter> for default ({}): ".format(ORIENTATIONS_PER_OBJECT)))
         
         if n_orients_input.strip() == "":
-            print('using default: '+str(n_orientations))
+            print('using default: ' + str(ORIENTATIONS_PER_OBJECT))
             break
             
         try:
-            n_orientations = int(eval(n_orients_input.strip()))
+            ORIENTATIONS_PER_OBJECT = int(eval(n_orients_input.strip()))
         except:
             print("couldn't convert input to integer; try again!")
             continue
 
-        if n_orientations <= 0:
+        if ORIENTATIONS_PER_OBJECT <= 0:
             print('invalid input - enter a nonzero, positive integer!')
             continue
-        elif n_orientations > 20:
+        elif ORIENTATIONS_PER_OBJECT > 20:
             print("capture process may take some time; go stretch your legs!")
             break
         else:
-            print(str(n_orientations)+" orientations is probably too few to properly train SVM, but here we go!")
+            print(str(ORIENTATIONS_PER_OBJECT) + " orientations is probably too few to properly train SVM, but here we go!")
             break
 
     while UI_PROMPTING:
-        hist_bins_input = str(input("enter number feature histogram bins, or enter for default ({}): ".format(histogram_bins)))
+        hist_bins_input = str(input("enter number feature histogram bins, or enter for default ({}): ".format(N_HIST_BINS)))
         if hist_bins_input.strip() == "":
-            print('using default: '+str(histogram_bins))
+            print('using default: ' + str(N_HIST_BINS))
             break
 
         try:
-            histogram_bins = int(eval(hist_bins_input.strip()))
+            N_HIST_BINS = int(eval(hist_bins_input.strip()))
         except:
             print("couldn't convert input to integer; try again!")
             continue
 
-        if histogram_bins <= 0:
+        if N_HIST_BINS <= 0:
             print('invalid input - enter a nonzero, positive integer!')
             continue
-        elif histogram_bins > 256:
+        elif N_HIST_BINS > 256:
             print('chose a number of bins: 0 < n_bins <= 256')
             continue
         else:
@@ -98,9 +98,9 @@ if __name__ == '__main__':
         delete_model()
         spawn_model(model_name)
 
-        for i in range(n_orientations):
-            pct = ((ind * n_orientations) + i) / (8 * n_orientations)
-            print(str(pct)+"%% - [ "+model_name+" : model "+str(ind+1)+" of 8 ] orientation ( "+str(i)+" of "+str(n_orientations)+" )")
+        for i in range(ORIENTATIONS_PER_OBJECT):
+            pct = ((ind * ORIENTATIONS_PER_OBJECT) + i) / (8 * ORIENTATIONS_PER_OBJECT)
+            print(str(pct) +"%% - [ " + model_name +" : model " + str(ind+1) +" of 8 ] orientation ( " + str(i) +" of " + str(ORIENTATIONS_PER_OBJECT) + " )")
             # make five attempts to get a valid a point cloud then give up
             sample_was_good = False
             try_count = 0
@@ -115,13 +115,13 @@ if __name__ == '__main__':
                     sample_was_good = True
 
             # Extract histogram features
-            hsv_hists = compute_color_histograms(sample_cloud, nbins=histogram_bins, using_hsv=True)
-            rgb_hists = compute_color_histograms(sample_cloud, nbins=histogram_bins, using_hsv=False)
+            hsv_hists = compute_color_histograms(sample_cloud, nbins=N_HIST_BINS, using_hsv=True)
+            rgb_hists = compute_color_histograms(sample_cloud, nbins=N_HIST_BINS, using_hsv=False)
             normals = get_normals(sample_cloud)
-            nhists = compute_normal_histograms(normals, nbins=histogram_bins)
+            nhists = compute_normal_histograms(normals, nbins=N_HIST_BINS)
             feature = np.concatenate((rgb_hists, hsv_hists, nhists))
             labeled_features.append([feature, model_name])
 
     delete_model()
 
-    pickle.dump(labeled_features, open(save_dir+'o{}_h{}_training_set.sav'.format(n_orientations, histogram_bins), 'wb'))
+    pickle.dump(labeled_features, open(save_dir +'o{}_h{}_training_set.sav'.format(ORIENTATIONS_PER_OBJECT, N_HIST_BINS), 'wb'))
