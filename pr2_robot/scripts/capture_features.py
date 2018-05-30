@@ -29,7 +29,8 @@ object_models = [
     'eraser',
     'soap2',
     'soap',
-    'glue']
+    'glue',
+]
 
 def get_normals(cloud):
     get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
@@ -37,7 +38,6 @@ def get_normals(cloud):
 
 
 if __name__ == '__main__':
-
     # set defaults
     n_orientations = 30
     histogram_bins = 64
@@ -45,11 +45,13 @@ if __name__ == '__main__':
     rospy.init_node('capture_node')
 
     while UI_PROMPTING:
-        n_orients_input = str(input("enter number of orientations per object or enter for default ({}): ".format(n_orientations)))
+        n_orients_input = str(input(
+            "enter number of orientations per object or <enter> for default ({}): ".format(ORIENTATIONS_PER_OBJECT)))
+        
         if n_orients_input.strip() == "":
             print('using default: '+str(n_orientations))
             break
-
+            
         try:
             n_orientations = int(eval(n_orients_input.strip()))
         except:
