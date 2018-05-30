@@ -21,7 +21,7 @@ save_dir = './savefiles/'
 UI_PROMPTING = True
 
 # Single complete list of all objects in the project
-object_models = [\
+object_models = [
     'sticky_notes',
     'book',
     'snacks',
