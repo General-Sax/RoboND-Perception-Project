@@ -48,7 +48,7 @@ if __name__ == '__main__':
     rospy.init_node('capture_node')
 
     while UI_PROMPTING:
-        n_orients_input = str(input(
+        n_orients_input = str(raw_input(
             "enter number of orientations per object or <enter> for default ({}): ".format(ORIENTATIONS_PER_OBJECT)))
         
         if n_orients_input.strip() == "":
@@ -72,7 +72,7 @@ if __name__ == '__main__':
             break
 
     while UI_PROMPTING:
-        hist_bins_input = str(input("enter number feature histogram bins, or enter for default ({}): ".format(N_HIST_BINS)))
+        hist_bins_input = str(raw_input("enter number feature histogram bins, or enter for default ({}): ".format(N_HIST_BINS)))
         if hist_bins_input.strip() == "":
             print('using default: ' + str(N_HIST_BINS))
             break
@@ -96,18 +96,21 @@ if __name__ == '__main__':
     initial_setup()
 
     labeled_features = []
+    max_cloud_capture_attempts = 10
 
     for ind, model_name in enumerate(model_list):
         delete_model()
         spawn_model(model_name)
 
         for i in range(ORIENTATIONS_PER_OBJECT):
-            pct = ((ind * ORIENTATIONS_PER_OBJECT) + i) / (8 * ORIENTATIONS_PER_OBJECT)
-            print(str(pct) +"%% - [ " + model_name +" : model " + str(ind+1) +" of 8 ] orientation ( " + str(i) +" of " + str(ORIENTATIONS_PER_OBJECT) + " )")
+            pct = 100.0 * ((float(ind) * ORIENTATIONS_PER_OBJECT) + i) / (8.0 * ORIENTATIONS_PER_OBJECT)
+            print(str(pct)[:4] +"% - [ " + model_name +" : model " + str(ind+1) +" of 8 ] orientation ( " + str(i) +" of " + str(ORIENTATIONS_PER_OBJECT) + " )")
             # make five attempts to get a valid a point cloud then give up
             sample_was_good = False
             try_count = 0
-            while not sample_was_good and try_count < 5:
+            sample_cloud = None
+
+            while not sample_was_good and try_count < max_cloud_capture_attempts:
                 sample_cloud = capture_sample()
                 sample_cloud_arr = ros_to_pcl(sample_cloud).to_array()
 
@@ -117,17 +120,22 @@ if __name__ == '__main__':
                 else:
                     sample_was_good = True
 
-            # Extract histogram features
-            hsv_hists = compute_color_histograms(sample_cloud, nbins=N_HIST_BINS, using_hsv=True)
-            rgb_hists = compute_color_histograms(sample_cloud, nbins=N_HIST_BINS, using_hsv=False)
-            normals = get_normals(sample_cloud)
-            nhists = compute_normal_histograms(normals, nbins=N_HIST_BINS)
-            feature = np.concatenate((rgb_hists, hsv_hists, nhists))
-            labeled_features.append([feature, model_name])
+            if sample_cloud is not None and sample_was_good:
+                # Extract histogram features
+                hsv_hists = compute_color_histograms(sample_cloud, nbins=N_HIST_BINS, using_hsv=True)
+                rgb_hists = compute_color_histograms(sample_cloud, nbins=N_HIST_BINS, using_hsv=False)
+                normals = get_normals(sample_cloud)
+                nhists = compute_normal_histograms(normals, nbins=N_HIST_BINS)
+                feature = np.concatenate((rgb_hists, hsv_hists, nhists))
+                labeled_features.append([feature, model_name])
+
+            else:
+                rospy.logwarn("Could not capture point cloud for orientation {} of object {} after {} attempts!".format(i, model_name, max_cloud_capture_attempts))
 
     delete_model()
 
     features_filename = 'o{}_h{}_training_set.sav'.format(ORIENTATIONS_PER_OBJECT, N_HIST_BINS)
+    print "saving features to file: {}".format(features_filename)
 
     pickle.dump(labeled_features, open(SAVE_DIR + features_filename, 'wb'))
 
