@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Import modules
+import sys
 import glob
 import time
 import pickle
@@ -33,15 +34,45 @@ from rospy_message_converter import message_converter
 
 
 save_dir = './savefiles/'
+save_clouds_to_pcd = True
 
-saveClouds = False
+
+class PCDSaver:
+    def __init__(self, output_directory, is_active):
+        self.is_active = is_active
+        self.output_directory = output_directory
+        self.pcd_list_on_init = glob.glob(output_directory + '*.pcd')
+        self.pcd_list = self.pcd_list_on_init[:]
+        self.pcd_files_written = []
+        self.requests_not_fulfilled = []
+
+    def dump(self, pcl_cloud, filename):
+        if not self.is_active:
+            pass
+        elif filename not in self.pcd_list:
+            pcl.save(pcl_cloud, self.output_directory + filename)
+            self.pcd_list.append(filename)
+            self.pcd_files_written.append(filename)
+        else:
+            self.requests_not_fulfilled.append(filename)
+
+saver = PCDSaver(save_dir, save_clouds_to_pcd)
+save_pcd = saver.dump
 
 # Helper function to get surface normals
 def get_normals(cloud):
     get_normals_prox = rospy.ServiceProxy('/feature_extractor/get_normals', GetNormals)
     return get_normals_prox(cloud).cluster
 
-def statOutlierFilter(pcl_cloud, mean_k=100, threshold_scale=0.5):
+
+def stat_outlier_filter(pcl_cloud, mean_k=100, threshold_scale=0.5):
+    '''
+
+    :param pcl_cloud:
+    :param mean_k:
+    :param threshold_scale:
+    :return:
+    '''
     # Much like the previous filters, we start by creating a filter object:
     outlier_filter = pcl_cloud.make_statistical_outlier_filter()
     # Set the number of neighboring points to analyze for any given point
@@ -52,9 +83,15 @@ def statOutlierFilter(pcl_cloud, mean_k=100, threshold_scale=0.5):
     cloud_filtered = outlier_filter.filter()
     return cloud_filtered
 
+
 def voxel_downsample(pcl_cloud, leaf_scale, coeffs=(1.0, 1.0, 1.0)):
-    # leaf_scale: sets default scale for voxel edge, units of meters
-    # coeffs: linear scaling factors for edges x, y, z respectively
+    '''
+
+    :param pcl_cloud: pcl representation of point cloud to downsample
+    :param leaf_scale: sets default scale for voxel edge, units of meters
+    :param coeffs: linear scaling factors for edges x, y, z respectively
+    :return: downsampled point cloud
+    '''
     vox = pcl_cloud.make_voxel_grid_filter()
     x_leaf, y_leaf, z_leaf = (leaf_scale * coeff for coeff in coeffs)
     vox.set_leaf_size(x_leaf, y_leaf, z_leaf)
@@ -87,6 +124,14 @@ def ransac_extract(pcl_cloud, max_distance=0.01, model=pcl.SACMODEL_PLANE, metho
     return extracted_inliers, extracted_outliers
 
 def cluster_indices(dark_cloud, clusterTolerance=0.01, minClusterSize=40, maxClusterSize=500):
+    '''
+    
+    :param dark_cloud: 
+    :param clusterTolerance: 
+    :param minClusterSize: 
+    :param maxClusterSize: 
+    :return: 
+    '''
     # construct a k-d tree from the cloud_objects point cloud
     tree = dark_cloud.make_kdtree()
     # Create a cluster extraction object
@@ -102,7 +147,13 @@ def cluster_indices(dark_cloud, clusterTolerance=0.01, minClusterSize=40, maxClu
     obj_cluster_indices = ec.Extract()
     return obj_cluster_indices
 
-def oneEuclideanCloud_fromIndices(dark_cloud, obj_cluster_indices_list):
+def one_euclidean_cloud_from_indices(dark_cloud, obj_cluster_indices_list):
+    '''
+    
+    :param dark_cloud: 
+    :param obj_cluster_indices_list: 
+    :return: 
+    '''
     cluster_color = get_color_list(len(obj_cluster_indices_list))
     color_cluster_point_list = []
     # Assign each point a color based on its cluster affiliation and append to
@@ -119,7 +170,14 @@ def oneEuclideanCloud_fromIndices(dark_cloud, obj_cluster_indices_list):
     pcl_clustered_cloud.from_list(color_cluster_point_list)
     return pcl_clustered_cloud
 
-def objClouds_fromIndices(pcl_cloud, obj_cluster_indices_list, negative_toggle=False):
+def object_clouds_from_indices(pcl_cloud, obj_cluster_indices_list, negative_toggle=False):
+    '''
+    
+    :param pcl_cloud: 
+    :param obj_cluster_indices_list: 
+    :param negative_toggle: 
+    :return: 
+    '''
     # Assign each point a color based on its cluster affiliation and append to
     # unified list of colored points
     cluster_list = []
@@ -136,25 +194,45 @@ def objClouds_fromIndices(pcl_cloud, obj_cluster_indices_list, negative_toggle=F
         # pcl_cloud_list.append(pcl_cloud_gen)
     return pcl_cloud_list
 
-def pcdRecord(pcl_cloud, filename):
-    global pcd_list
-    if filename not in pcd_list:
-        pcd_list.append(filename)
-        pcl.save(pcl_cloud, save_dir+filename)
-    else:
-        pass
+
+# def save_pcd(pcl_cloud, filename):
+#     '''
+#
+#     :param pcl_cloud:
+#     :param filename:
+#     :return:
+#     '''
+#     global pcd_list
+#     if filename not in pcd_list:
+#         pcd_list.append(filename)
+#         pcl.save(pcl_cloud, save_dir+filename)
+#     else:
+#         pass
 
 def centroid_of_(object_name, pcl_cloud=None, cast_python_float=True):
-    global trackedCentroids
+    '''
+    
+    :param object_name: 
+    :param pcl_cloud: 
+    :param cast_python_float: 
+    :return: 
+    '''
+    global tracked_centroids
     if pcl_cloud:
-        trackedCentroids[object_name] = np.mean(pcl_cloud, axis=0)[:3]
+        tracked_centroids[object_name] = np.mean(pcl_cloud, axis=0)[:3]
 
     if cast_python_float:
-        return [np.asscalar(trackedCentroids[object_name][i]) for i in (0, 1, 2)]
+        return [np.asscalar(tracked_centroids[object_name][i]) for i in (0, 1, 2)]
 
-    return trackedCentroids[object_name]
+    return tracked_centroids[object_name]
+
 
 def collision_cloud(target_item_name, pcl_cloud):
+    '''
+    :param target_item_name: 
+    :param pcl_cloud: 
+    :return: 
+    '''
     # pcl_cloud here should be from before the ransac segmentation step
     global object_list_param, completed_transports, object_ref_dict
     collidable = pcl_cloud
@@ -166,11 +244,18 @@ def collision_cloud(target_item_name, pcl_cloud):
             collidable = collidable.extract(object_ref_dict[item]['indices'], negative=True)
         else:
             pass
-    if saveClouds: pcdRecord(collidable, '07_collision_cloud.pcd')
+    save_pcd(collidable, '07_collision_cloud.pcd')
     ros_collision_cloud = pcl_to_ros(collidable)
     return ros_collision_cloud
 
+
 def joint_state_digester(joint_state_data, abs_ang_delta_tolerance=0.01):
+    '''
+    
+    :param joint_state_data: 
+    :param abs_ang_delta_tolerance: 
+    :return: 
+    '''
     global world_joint_pos, world_joint_moving
 
     angle_delta = joint_state_data.position[-1] - world_joint_pos
@@ -182,6 +267,13 @@ def joint_state_digester(joint_state_data, abs_ang_delta_tolerance=0.01):
 
 # bot pivot manager
 def pivot_bot(world_joint_goal, absolute_angle_tolerance, auto_recenter=True):
+    '''
+    
+    :param world_joint_goal: 
+    :param absolute_angle_tolerance: 
+    :param auto_recenter: 
+    :return: 
+    '''
     global world_joint_pos, world_joint_moving, l_pivoted, r_pivoted
     sgn = np.sign(world_joint_goal)
     output_text = ''
@@ -233,6 +325,15 @@ def pivot_bot(world_joint_goal, absolute_angle_tolerance, auto_recenter=True):
 
 # Helper function to create a yaml friendly dictionary from ROS messages
 def make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose):
+    '''
+    
+    :param test_scene_num: 
+    :param arm_name: 
+    :param object_name: 
+    :param pick_pose: 
+    :param place_pose: 
+    :return: 
+    '''
     yaml_dict = {}
     yaml_dict["test_scene_num"] = test_scene_num.data
     yaml_dict["arm_name"]  = arm_name.data
@@ -243,18 +344,28 @@ def make_yaml_dict(test_scene_num, arm_name, object_name, pick_pose, place_pose)
 
 # Helper function to output to yaml file
 def send_to_yaml(yaml_filename, dict_list):
+    '''
+    
+    :param yaml_filename: 
+    :param dict_list: 
+    :return: 
+    '''
     data_dict = {"object_list": dict_list}
     with open(yaml_filename, 'w') as outfile:
         yaml.dump(data_dict, outfile, default_flow_style=False)
 
 
-
 # Callback function for your Point Cloud Subscriber
 def pcl_callback(pcl_msg):
+    '''
+    
+    :param pcl_msg: 
+    :return: 
+    '''
     ### Exercise-2 TODOs:
     ### Convert ROS msg to PCL data
     pcl_cloud = ros_to_pcl(pcl_msg)
-    if saveClouds: pcdRecord(pcl_cloud, '00_raw_cloud.pcd')
+    save_pcd(pcl_cloud, '00_raw_cloud.pcd')
 
     ### PassThrough Filter
     Z_AXIS_MIN = 0.4
@@ -268,20 +379,20 @@ def pcl_callback(pcl_msg):
     # passthrough filter out the xy-range which corresponds to the table
     pcl_cloud = passthrough_filter(pcl_cloud, axis_min=Y_AXIS_MIN, axis_max=Y_AXIS_MAX, filter_axis='y')
     pcl_cloud = passthrough_filter(pcl_cloud, axis_min=X_AXIS_MIN, axis_max=X_AXIS_MAX, filter_axis='x')
-    if saveClouds: pcdRecord(pcl_cloud, '01_passthrough_filtered.pcd')
+    save_pcd(pcl_cloud, '01_passthrough_filtered.pcd')
 
     ### Statistical Outlier Filtering
     MEAN_K_1 = 10
     THRESHOLD_SCALE_1 = 0.8
 
-    pcl_cloud = statOutlierFilter(pcl_cloud, mean_k=MEAN_K_1, threshold_scale=THRESHOLD_SCALE_1)
-    if saveClouds: pcdRecord(pcl_cloud, '02a_outlier_filtered.pcd')
+    pcl_cloud = stat_outlier_filter(pcl_cloud, mean_k=MEAN_K_1, threshold_scale=THRESHOLD_SCALE_1)
+    save_pcd(pcl_cloud, '02a_outlier_filtered.pcd')
 
     MEAN_K_2 = 10
     THRESHOLD_SCALE_2 = 1.6
 
-    pcl_cloud = statOutlierFilter(pcl_cloud, mean_k=MEAN_K_2, threshold_scale=THRESHOLD_SCALE_2)
-    if saveClouds: pcdRecord(pcl_cloud, '02b_outlier_refiltered.pcd')
+    pcl_cloud = stat_outlier_filter(pcl_cloud, mean_k=MEAN_K_2, threshold_scale=THRESHOLD_SCALE_2)
+    save_pcd(pcl_cloud, '02b_outlier_refiltered.pcd')
 
 
     ### Voxel Grid Downsampling
@@ -289,14 +400,14 @@ def pcl_callback(pcl_msg):
     LEAF_SCALE = 0.005 # meters per voxel_edge - this will affect the required level for MIN_CLUSTER_SIZE
     XYZ_VOXEL_COEFFS=(1.0, 1.0, 1.0) # scale xyz dimensions of voxel independently
     pcl_cloud = voxel_downsample(pcl_cloud, leaf_scale=LEAF_SCALE, coeffs=XYZ_VOXEL_COEFFS)
-    if saveClouds: pcdRecord(pcl_cloud, '03_voxel_downsampled.pcd')
+    save_pcd(pcl_cloud, '03_voxel_downsampled.pcd')
 
     ### RANSAC Plane Segmentation
     MAX_DIST = 0.0025
     pcl_cloud_table, pcl_cloud_objects = ransac_extract(pcl_cloud, max_distance=MAX_DIST)
-    if saveClouds:
-        pcdRecord(pcl_cloud_table, '04a_table_segment.pcd')
-        pcdRecord(pcl_cloud_objects, '04b_objects_segment.pcd')
+
+    save_pcd(pcl_cloud_table, '04a_table_segment.pcd')
+    save_pcd(pcl_cloud_objects, '04b_objects_segment.pcd')
 
     ### Euclidean Clustering
     CLUSTER_TOLERANCE = 0.01
@@ -305,7 +416,7 @@ def pcl_callback(pcl_msg):
     # create copy of objects cloud, convert XYZRGB to XYZ
     # It is dark because it has no color ;)
     dark_cloud = XYZRGB_to_XYZ(pcl_cloud_objects)
-    if saveClouds: pcdRecord(dark_cloud, '05_dark_cloud.pcd')
+    save_pcd(dark_cloud, '05_dark_cloud.pcd')
 
     # Apply Euclidean clustering and aggregate into single cluster where points
     # are colored by cluster
@@ -313,11 +424,11 @@ def pcl_callback(pcl_msg):
                     clusterTolerance=CLUSTER_TOLERANCE,
                     minClusterSize=MIN_CLUSTER_SIZE,
                     maxClusterSize=MAX_CLUSTER_SIZE)
-    pcl_clustered_cloud = oneEuclideanCloud_fromIndices(dark_cloud, cluster_indices_list)
-    if saveClouds: pcdRecord(dark_cloud, '06_oneEuclideanCloud.pcd')
+    pcl_clustered_cloud = one_euclidean_cloud_from_indices(dark_cloud, cluster_indices_list)
+    save_pcd(dark_cloud, '06_oneEuclideanCloud.pcd')
 
     ### Create Cluster-Mask Point Cloud to visualize each cluster separately
-    pcl_object_clouds = objClouds_fromIndices(pcl_cloud_objects, cluster_indices_list)
+    pcl_object_clouds = object_clouds_from_indices(pcl_cloud_objects, cluster_indices_list)
 
     ### Convert PCL data to ROS messages
     ros_objects = [pcl_to_ros(pcl_object_clouds[i]) for i in xrange(0, len(pcl_object_clouds))]
@@ -383,6 +494,12 @@ def pcl_callback(pcl_msg):
 
 # function to load parameters and request PickPlace service
 def pr2_mover(object_list, pcl_cloud):
+    '''
+    
+    :param object_list: 
+    :param pcl_cloud: 
+    :return: 
+    '''
     global object_list_param
     # TODO: Initialize variables
     labels = []
@@ -482,7 +599,7 @@ def pr2_mover(object_list, pcl_cloud):
 
 
 if __name__ == '__main__':
-    if saveClouds:
+    if save_clouds_to_pcd:
         pcd_list = glob.glob(save_dir+'*.pcd')
 
     ### Load Model From disk - done first to save ROS overhead in case of failure
@@ -492,20 +609,35 @@ if __name__ == '__main__':
     #  'scaler': <calls sklearn.preprocessing.StandardScaler() class instantiation>
     # } # classifier and scaler generated w/saved presets
 
-    TEST_SCENE_NUM = Int32()
-    TEST_SCENE_NUM.data = int(eval(glob.glob('*.breadcrumb')[0][0]))
-    print("\nTest scene number: "+str(TEST_SCENE_NUM))
+    if len(sys.argv) > 1:
+        scene_number = int(sys.argv[1])
 
+    # TODO: FINISH REMOVING STUPID BREADCRUMB LOGIC
+    elif len(glob.glob('*.breadcrumb')) > 0:
+        scene_number = int(glob.glob('*.breadcrumb')[0][0])
+        
+    else:
+        raise RuntimeError("Could not determine scene to load!")
+    
+    assert isinstance(scene_number, int)
+    assert scene_number in (1, 2, 3)
+
+    TEST_SCENE_NUM = Int32()
+    TEST_SCENE_NUM.data = scene_number
+    
+    print("\nTest scene number: "+str(TEST_SCENE_NUM))
+    
     model_glob_pattern = 'fullmodel_*_o*_h*.sav'
     model_file_match = glob.glob(save_dir+model_glob_pattern)
-
+    
     QUIT_OUT = False # a failthrough option in case there is an issue loading model
-
+    
     if not model_file_match:
         print('No model matching glob pattern "{}" was detected!'.format(model_glob_pattern))
         while True:
-            model_filename = str(input("enter target model filename manually, or press enter to quit: "))
-
+#            model_filename = str(input("enter target model filename manually, or press enter to quit: "))
+            model_filename = raw_input("enter target model filename manually, or press enter to quit: ")
+            print model_filename
             if model_filename.strip() == "":
                 print('exiting project_template.py... ')
                 QUIT_OUT = True
@@ -559,13 +691,13 @@ if __name__ == '__main__':
         object_list_param = rospy.get_param('/object_list')
 
         ### create object centroid tracker
-        trackedCentroids = {}
+        tracked_centroids = {}
 
         ### tracker for items successfully pick-place'd
         completed_transports = []
 
         ###
-        object_ref_dict = {\
+        object_ref_dict = {
             'sticky_notes': {'ros': None, 'pcl': None, 'indices': None},
             'book':         {'ros': None, 'pcl': None, 'indices': None},
             'snacks':       {'ros': None, 'pcl': None, 'indices': None},
@@ -581,7 +713,6 @@ if __name__ == '__main__':
         # pcl_sub = rospy.Subscriber("/pr2/world/points", pc2.PointCloud2, pcl_callback, queue_size=1)
         pcl_sub = rospy.Subscriber("/pr2/world/points", PointCloud2, pcl_callback, queue_size=1)
         # joint_state_sub = rospy.Subscriber('/pr2/joint_states', JointState, jointstate_callback, queue_size=1)
-
 
         ### Create Publishers - What am I supposed to be publishing here? Do I need more still?
         # Table and Objects Clouds
@@ -601,5 +732,6 @@ if __name__ == '__main__':
         ### Spin while node is not shutdown
         while not rospy.is_shutdown():
             rospy.spin()
+
     else:
         pass
