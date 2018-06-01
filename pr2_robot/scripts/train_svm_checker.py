@@ -19,7 +19,6 @@ def plot_confusion_matrix(cm, classes,
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
-    # cm = cm.astype('float')
     fstr = '{}'
     if normalize:
         fstr = '{0:.2f}'
@@ -41,16 +40,17 @@ def plot_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
 
+
 # Create classifier
 if __name__ == "__main__":
     print("\nTraining and selecting SVMs for all test data sets!")
+
     kernels = ['linear', 'rbf', 'poly', 'sigmoid']
-    # for test_number in (1, 2, 3):
-        # print('\nTest number: '+str(test_number))
 
     # Load training data from disk
+    # TODO: Add selection
     training_set = glob.glob(save_dir+'*_training_set.sav')[0]
-    orientation_ct = training_set.split('_')[0]
+    orientation_ct = (training_set.split('_')[0]).split('/')[-1]
     n_bins = training_set.split('_')[1]
 
     training_set = pickle.load(open(training_set, 'rb'))
@@ -88,10 +88,7 @@ if __name__ == "__main__":
     # y_test = encoder.fit_transform(y_test)
 
     results = {}
-    # krnl = 'linear'
-    # krnl = 'rbf'
-    # krnl = 'poly'
-    # krnl = 'sigmoid'
+
     for krnl in kernels:
       print("\n"+krnl)
       clf = svm.SVC(kernel=krnl)
@@ -150,7 +147,10 @@ if __name__ == "__main__":
     model = {'classifier': clf, 'classes': encoder.classes_, 'scaler': X_scaler}
 
     # Save classifier to disk
-    pickle.dump(model, open(save_dir+'fullmodel_{}_{}_{}.sav'.format(krnl_final, orientation_ct, n_bins), 'wb'))
+    filename = 'fullmodel_{}_{}_{}.sav'.format(krnl_final, orientation_ct, n_bins)
+    print "saving features to file: {}".format(filename)
+
+    pickle.dump(model, open(save_dir+filename, 'wb'))
 
     # Plot non-normalized confusion matrix
     plt.figure()
